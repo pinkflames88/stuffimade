@@ -1,50 +1,64 @@
-const api = {
-    key: "8b59f01b318900ea52653048da259269",
-    base: "https://api.openweathermap.org/data/2.5/"
-  }
-  
-  const searchbox = document.querySelector('.search-box');
-  searchbox.addEventListener('keypress', setQuery);
-  
-  function setQuery(evt) {
-    if (evt.keyCode == 13) {
-      getResults(searchbox.value);
-    }
-  }
-  
-  function getResults (query) {
-    fetch(`${api.base}weather?q=${query}&units=metric&APPID=${api.key}`)
-      .then(weather => {
-        return weather.json();
-      }).then(displayResults);
-  }
-  
-  function displayResults (weather) {
-    let city = document.querySelector('.location .city');
-    city.innerText = `${weather.name}, ${weather.sys.country}`;
-  
-    let now = new Date();
-    let date = document.querySelector('.location .date');
-    date.innerText = dateBuilder(now);
-  
-    let temp = document.querySelector('.current .temp');
-    temp.innerHTML = `${Math.round(weather.main.temp)}<span>°c</span>`;
-  
-    let weather_el = document.querySelector('.current .weather');
-    weather_el.innerText = weather.weather[0].main;
-  
-    let hilow = document.querySelector('.hi-low');
-    hilow.innerText = `${Math.round(weather.main.temp_min)}°c / ${Math.round(weather.main.temp_max)}°c`;
-  }
-  
-  function dateBuilder (d) {
-    let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  
-    let day = days[d.getDay()];
-    let date = d.getDate();
-    let month = months[d.getMonth()];
-    let year = d.getFullYear();
-  
-    return `${day} ${date} ${month} ${year}`;
-  }
+var enterButton = document.getElementById("enter");
+var input = document.getElementById("userInput");
+var ul = document.querySelector("ul");
+var item = document.getElementsByTagName("li");
+
+function inputLength(){
+	return input.value.length;
+} 
+
+function listLength(){
+	return item.length;
+}
+
+function createListElement() {
+	var li = document.createElement("li"); // creates an element "li"
+	li.appendChild(document.createTextNode(input.value)); //makes text from input field the li text
+	ul.appendChild(li); //adds li to ul
+	input.value = ""; //Reset text input field
+
+
+	//START STRIKETHROUGH
+	// because it's in the function, it only adds it for new items
+	function crossOut() {
+		li.classList.toggle("done");
+	}
+
+	li.addEventListener("click",crossOut);
+	//END STRIKETHROUGH
+
+
+	// START ADD DELETE BUTTON
+	var dBtn = document.createElement("button");
+	dBtn.appendChild(document.createTextNode("X"));
+	li.appendChild(dBtn);
+	dBtn.addEventListener("click", deleteListItem);
+	// END ADD DELETE BUTTON
+
+
+	//ADD CLASS DELETE (DISPLAY: NONE)
+	function deleteListItem(){
+		li.classList.add("delete")
+	}
+	//END ADD CLASS DELETE
+}
+
+
+function addListAfterClick(){
+	if (inputLength() > 0) { //makes sure that an empty input field doesn't create a li
+		createListElement();
+	}
+}
+
+function addListAfterKeypress(event) {
+	if (inputLength() > 0 && event.which ===13) { //this now looks to see if you hit "enter"/"return"
+		//the 13 is the enter key's keycode, this could also be display by event.keyCode === 13
+		createListElement();
+	} 
+}
+
+
+enterButton.addEventListener("click",addListAfterClick);
+
+input.addEventListener("keypress", addListAfterKeypress);
+
